@@ -1,0 +1,43 @@
+version: "3.5"
+
+services:
+  risyu-db:
+    container_name: "risyu-db"
+    image: "mysql:5.7"
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_DATABASE: "risyu"
+      MYSQL_USER: "risyu"
+      MYSQL_PASSWORD: "risyu"
+    ports:
+      - 3306:3306
+    volumes:
+      - "./docker/mysql_conf:/etc/mysql/conf.d"
+      - "./docker/mysql-data:/var/lib/mysql"
+  risyu-web:
+    container_name: "risyu-web"
+    build: "./docker/php"
+    volumes:
+      - "./app:/app"
+      #- "./docker/.env:/app/.env"
+      - "./docker/php/apache2/sites-enabled/000-default.conf:/etc/apache2/sites-enabled/000-default.conf:ro"
+      - "./docker/php/php.ini:/usr/local/etc/php/php.ini"
+      - "./docker/php/cron/crontab:/var/spool/cron/crontabs/root"
+    ports:
+      - 80:80
+    links:
+      - "risyu-db:risyu-db"
+  risyu-nuxt:
+    container_name: "risyu-nuxt"
+    build: "./docker/nuxt"
+    ports:
+      - 3000:3000
+    volumes:
+      - ./nuxt:/app
+    stdin_open: true
+    tty: true
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+networks:
+  default:
+    name: risyu-net
