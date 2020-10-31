@@ -24,7 +24,7 @@ services:
       - "./docker/php/php.ini:/usr/local/etc/php/php.ini"
       - "./docker/php/cron/crontab:/var/spool/cron/crontabs/root"
     ports:
-      - 80:80
+      - 8088:80
     links:
       - "risyu-db:risyu-db"
   risyu-nuxt:
